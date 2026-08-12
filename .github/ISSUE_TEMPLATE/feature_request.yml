@@ -1,0 +1,32 @@
+name: 功能建议
+description: 建议新的功能或体验改进
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: 你遇到的问题
+      description: 请先描述实际使用中遇到的困难，而不只是功能名称。
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建议方案
+      description: 你希望工具如何解决这个问题？
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 目前的替代方法
+      description: 如果有，请说明你现在如何完成这项工作。
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: 项目原则
+      options:
+        - label: 我理解项目优先保持本地处理，不会默认上传用户 Excel。
+          required: true
