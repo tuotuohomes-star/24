@@ -1,0 +1,18 @@
+.DS_Store
+Thumbs.db
+*.xlsx
+*.xls
+*.csv
+*.tsv
+*.zip
+*.log
+
+# Never commit local credentials or environment files.
+.env
+.env.*
+!.env.example
+
+# Common dependency and build directories.
+node_modules/
+dist/
+build/

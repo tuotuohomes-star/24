@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <title>上市产品价格合并工具</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" role="img">
+            <path d="M8 8.5h16v15H8z" fill="none" stroke="currentColor" stroke-width="2" />
+            <path d="M11 13h10M11 17h10M11 21h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <path d="m21.5 5 4.5 4.5" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" />
+          </svg>
+        </div>
+        <div>
+          <p class="eyebrow">LOCAL MERGE · PRIVATE BY DESIGN</p>
+          <h1>上市产品价格合并工具</h1>
+          <p class="subtitle">导入两个 Excel 文件，自动匹配物料业务状态，一键导出标准价格查询表。</p>
+        </div>
+        <div class="privacy-pill">
+          <span class="privacy-dot"></span>
+          数据仅在本机处理
+        </div>
+      </header>
+
+      <section class="workspace-card" aria-labelledby="import-heading">
+        <div class="section-heading">
+          <div>
+            <p class="step-label">STEP 01</p>
+            <h2 id="import-heading">选择数据文件</h2>
+          </div>
+          <button id="resetBtn" class="text-button" type="button" disabled>重新选择</button>
+        </div>
+
+        <div class="file-grid">
+          <article class="file-card" id="priceDrop" tabindex="0" role="button" aria-controls="priceFile">
+            <input id="priceFile" type="file" accept=".xlsx" hidden />
+            <div class="file-icon price-icon" aria-hidden="true">价</div>
+            <div class="file-copy">
+              <span class="file-kicker">文件 1</span>
+              <h3>价格列表查询</h3>
+              <p>需要包含：物料编码、物料名称、规格、单价</p>
+              <div class="file-state" id="priceState">点击选择或拖入 .xlsx 文件</div>
+            </div>
+            <span class="select-chip">选择文件</span>
+          </article>
+
+          <article class="file-card" id="masterDrop" tabindex="0" role="button" aria-controls="masterFile">
+            <input id="masterFile" type="file" accept=".xlsx" hidden />
+            <div class="file-icon master-icon" aria-hidden="true">料</div>
+            <div class="file-copy">
+              <span class="file-kicker">文件 2</span>
+              <h3>物料主数据</h3>
+              <p>需要包含：物料编码、物料名称、规格、物料业务状态</p>
+              <div class="file-state" id="masterState">点击选择或拖入 .xlsx 文件</div>
+            </div>
+            <span class="select-chip">选择文件</span>
+          </article>
+        </div>
+
+        <div class="action-row">
+          <div class="action-hint">
+            <span class="hint-icon">i</span>
+            两个文件选齐后会自动开始；大文件处理时请保持页面打开。
+          </div>
+          <button id="mergeBtn" class="primary-button" type="button" disabled>
+            <span>开始合并</span>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10m-4-4 4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </button>
+        </div>
+      </section>
+
+      <section class="progress-card hidden" id="progressSection" aria-live="polite">
+        <div class="progress-topline">
+          <div>
+            <p class="step-label">PROCESSING</p>
+            <h2 id="progressTitle">正在准备文件…</h2>
+          </div>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+        <p class="progress-detail" id="progressDetail">正在检查表头和文件结构</p>
+      </section>
+
+      <section class="result-card hidden" id="resultSection" aria-labelledby="result-heading">
+        <div class="result-header">
+          <div>
+            <p class="step-label success-label">STEP 02 · COMPLETE</p>
+            <h2 id="result-heading">合并完成</h2>
+            <p id="resultSummary">数据已通过校验，可以导出。</p>
+          </div>
+          <div class="export-action">
+            <button id="exportBtn" class="export-button" type="button">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9m0 0 3-3m-3 3L7 9M4 15h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              导出 Excel
+            </button>
+            <span id="exportFeedback" class="export-feedback hidden" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat"><span>输出物料</span><strong id="totalCount">—</strong></div>
+          <div class="stat listed"><span>已上市</span><strong id="listedCount">—</strong></div>
+          <div class="stat retired"><span>已淘汰</span><strong id="retiredCount">—</strong></div>
+          <div class="stat warning"><span>异常记录</span><strong id="issueCount">—</strong></div>
+        </div>
+
+        <div class="warning-panel hidden" id="warningPanel">
+          <strong>需要留意</strong>
+          <p id="warningText"></p>
+        </div>
+
+        <div class="preview-heading">
+          <h3>结果预览</h3>
+          <span>仅展示前 12 条，导出文件包含全部记录</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>物料编码</th>
+                <th>物料名称</th>
+                <th>规格</th>
+                <th class="number-cell">单价</th>
+                <th>物料业务状态</th>
+              </tr>
+            </thead>
+            <tbody id="previewBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="error-card hidden" id="errorSection" role="alert">
+        <div class="error-icon">!</div>
+        <div>
+          <h2>处理未完成</h2>
+          <p id="errorText"></p>
+        </div>
+      </section>
+
+      <footer>
+        <span>支持 .xlsx · 全程离线处理 · 不上传数据</span>
+        <span>输出字段：物料编码 / 物料名称 / 规格 / 单价 / 物料业务状态</span>
+      </footer>
+    </main>
+
+    <script src="vendor/xlsx.full.min.js"></script>
+    <script src="app.js?v=1.0.0"></script>
+  </body>
+</html>
